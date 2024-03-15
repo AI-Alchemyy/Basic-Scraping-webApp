@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Web Scraper by AI Alchemy</title>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+        <link href="style.css" rel="stylesheet">
+        <link rel="icon" type="image/png" href="https://fiverr-res.cloudinary.com/t_profile_original,q_auto,f_auto/attachments/profile/photo/e19d0183689b7f2b1e5661bcef238f57-1694651573836/f5519141-06ee-4868-a4b3-813baa4c9bee.png">
+    </head>
+<body>
+    <h2>Web Scraper by AI Alchemy</h2>
+    <div class="instruction">Insert the desired website you want to scrape:</div>
+    <form id="scrapeForm">
+        <input type="text" id="url" placeholder="Enter URL to scrape" required>
+        <button type="submit" id="viewButton" disabled>View</button>
+        <button type="submit" id="downloadButton" disabled>Download</button>
+    </form>
+    <div class="instruction">Scraped Content:</div>
+    <div id="result"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const viewButton = document.getElementById('viewButton');
+            const downloadButton = document.getElementById('downloadButton');
+            const urlInput = document.getElementById('url');
+
+            // Function to enable/disable buttons based on URL input
+            const toggleButtons = () => {
+                const url = urlInput.value.trim();
+                viewButton.disabled = downloadButton.disabled = !url;
+            };
+        
+            // Toggle buttons when URL input changes
+            urlInput.addEventListener('input', toggleButtons);
+        
+            // Button click event handler
+            const handleButtonClick = (e) => {
+                e.preventDefault(); // Prevent the default form submission
+                const url = urlInput.value.trim();
+                const action = e.target.id === 'viewButton' ? 'view' : 'download'; // Determine action based on clicked button
+        
+                fetch('https://dd94-110-39-167-136.ngrok-free.app/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url, action: action }), // Include the action parameter in the request
+                })
+                .then(response => {
+                    if (response.headers.get('content-type').includes('application/json')) {
+                        // Handle JSON response
+                        return response.json();
+                    } else {
+                        // Handle binary file (e.g., .docx)
+                        return response.blob();
+                    }
+                })
+                .then(data => {
+                    if (action === 'download') {
+                        // Download the .docx file
+                        const url = window.URL.createObjectURL(data);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'scraped_content.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    } else {
+                        // Display the scraped content
+                        document.getElementById('result').textContent = `Content: ${data.content}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('result').textContent = 'Failed to scrape the URL.';
+                });
+            };
+        
+            // Attach click event handlers to buttons
+            viewButton.addEventListener('click', handleButtonClick);
+            downloadButton.addEventListener('click', handleButtonClick);
+        });
+    </script>
+</body>
+</html>
