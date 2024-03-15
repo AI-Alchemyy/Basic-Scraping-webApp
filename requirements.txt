@@ -3,5 +3,4 @@ Flask-CORS
 requests
 beautifulsoup4
 python-docx
-io
 regex
