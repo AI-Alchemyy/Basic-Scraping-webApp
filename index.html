@@ -1,46 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Web Scraper by AI Alchemy</title>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-        <link href="style.css" rel="stylesheet">
-        <link rel="icon" type="image/png" href="https://fiverr-res.cloudinary.com/t_profile_original,q_auto,f_auto/attachments/profile/photo/e19d0183689b7f2b1e5661bcef238f57-1694651573836/f5519141-06ee-4868-a4b3-813baa4c9bee.png">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper by AI Alchemy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://fiverr-res.cloudinary.com/t_profile_original,q_auto,f_auto/attachments/profile/photo/e19d0183689b7f2b1e5661bcef238f57-1694651573836/f5519141-06ee-4868-a4b3-813baa4c9bee.png">
+</head>
 <body>
     <h2>Web Scraper by AI Alchemy</h2>
-    <div class="instruction">Insert the desired website you want to scrape:</div>
-    <form id="scrapeForm">
+    <div class="instruction">Choose an option:</div>
+    <button id="scrapeButton">Scrape a Website</button>
+    <button id="sitemapButton">Extract URLs from a Sitemap</button>
+    <form id="scrapeForm" class="hidden">
         <input type="text" id="url" placeholder="Enter URL to scrape" required>
         <button type="submit" id="viewButton" disabled>View</button>
         <button type="submit" id="downloadButton" disabled>Download</button>
+    </form>
+    <form id="sitemapForm" class="hidden">
+        <input type="text" id="sitemapUrl" placeholder="Enter Sitemap URL" required>
+        <button type="submit" id="extractButton" disabled>Show URLs</button>
     </form>
     <div class="instruction">Scraped Content:</div>
     <div id="result"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
+            const scrapeButton = document.getElementById('scrapeButton');
+            const sitemapButton = document.getElementById('sitemapButton');
             const viewButton = document.getElementById('viewButton');
             const downloadButton = document.getElementById('downloadButton');
+            const extractButton = document.getElementById('extractButton');
             const urlInput = document.getElementById('url');
+            const sitemapUrlInput = document.getElementById('sitemapUrl');
+            const scrapeForm = document.getElementById('scrapeForm');
+            const sitemapForm = document.getElementById('sitemapForm');
+            const resultDiv = document.getElementById('result');
 
             // Function to enable/disable buttons based on URL input
             const toggleButtons = () => {
                 const url = urlInput.value.trim();
                 viewButton.disabled = downloadButton.disabled = !url;
             };
-        
+
             // Toggle buttons when URL input changes
             urlInput.addEventListener('input', toggleButtons);
-        
-            // Button click event handler
-            const handleButtonClick = (e) => {
+            sitemapUrlInput.addEventListener('input', () => {
+                extractButton.disabled = !sitemapUrlInput.value.trim();
+            });
+
+            // Show scrape form when Scrape button is clicked
+            scrapeButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                scrapeForm.classList.remove('hidden');
+                sitemapForm.classList.add('hidden');
+            });
+
+            // Show sitemap form when Extract button is clicked
+            sitemapButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                sitemapForm.classList.remove('hidden');
+                scrapeForm.classList.add('hidden');
+            });
+
+            // Button click event handler for scraping
+            const handleScrapeButtonClick = (e) => {
                 e.preventDefault(); // Prevent the default form submission
                 const url = urlInput.value.trim();
                 const action = e.target.id === 'viewButton' ? 'view' : 'download'; // Determine action based on clicked button
-        
-                fetch('https://6d82-110-39-167-136.ngrok-free.app/scrape', {
+
+                fetch('http://127.0.0.1:5000/scrape', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -68,18 +98,40 @@
                         document.body.removeChild(a);
                     } else {
                         // Display the scraped content
-                        document.getElementById('result').textContent = `Content: ${data.content}`;
+                        resultDiv.textContent = `Content: ${data.content}`;
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    document.getElementById('result').textContent = 'Failed to scrape the URL.';
+                    resultDiv.textContent = 'Failed to scrape the URL.';
                 });
             };
-        
-            // Attach click event handlers to buttons
-            viewButton.addEventListener('click', handleButtonClick);
-            downloadButton.addEventListener('click', handleButtonClick);
+
+            // Button click event handler for sitemap extraction
+            extractButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sitemapUrl = sitemapUrlInput.value.trim();
+
+                fetch('http://127.0.0.1:5000/sitemap-extract', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sitemap_url: sitemapUrl }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.textContent = `URLs: ${data.urls.join(', ')}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultDiv.textContent = 'Failed to extract URLs from the sitemap.';
+                });
+            });
+
+            // Attach click event handlers to buttons for scraping
+            viewButton.addEventListener('click', handleScrapeButtonClick);
+            downloadButton.addEventListener('click', handleScrapeButtonClick);
         });
     </script>
 </body>
