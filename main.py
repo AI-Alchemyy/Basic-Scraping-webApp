@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from docx import Document
 import io
 import re
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all domains
@@ -50,5 +51,26 @@ def scrape():
         print(e)
         return jsonify({'error': str(e)}), 500
 
+@app.route('/sitemap-extract', methods=['POST'])
+def sitemap_extract():
+    data = request.get_json()
+    sitemap_url = data.get('sitemap_url')
+
+    if not sitemap_url:
+        return jsonify({'error': 'Missing sitemap URL'}), 400
+
+    try:
+        response = requests.get(sitemap_url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        urls = [url.text for url in soup.find_all('loc')]
+        
+        # Filter out non-HTTP/HTTPS URLs
+        urls = [url for url in urls if urlparse(url).scheme in ('http', 'https')]
+        
+        return jsonify({'urls': urls})
+    except Exception as e:
+        print(e)
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
