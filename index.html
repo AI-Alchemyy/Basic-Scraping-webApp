@@ -40,7 +40,7 @@
                 const url = urlInput.value.trim();
                 const action = e.target.id === 'viewButton' ? 'view' : 'download'; // Determine action based on clicked button
         
-                fetch('http://127.0.0.1:5000/scrape', {
+                fetch('https://6d82-110-39-167-136.ngrok-free.app/scrape', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
