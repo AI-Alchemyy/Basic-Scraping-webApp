@@ -134,7 +134,18 @@ h2 {
 #url {
     width: 300px;
     padding: 10px;
+    margin-right: 10px;
     margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+
+#sitemapUrl {
+    width: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
 }
@@ -172,4 +183,64 @@ button:disabled {
     height: 600px;
     overflow-y: auto;
     white-space: pre-wrap;
+}
+button#viewButton,
+button#downloadButton {
+    padding: 10px 20px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #002fff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button#viewButton:hover,
+button#downloadButton:hover {
+    background-color: black;
+    color: white;
+}
+
+button#viewButton:disabled,
+button#downloadButton:disabled {
+    background-color: #ddd;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+button#scrapeButton
+{
+    padding: 10px 20px;
+    margin-right: 1px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #002fff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 1s, color 1s;
+}
+button#scrapeButton:hover {
+    background-color: black;
+    color: white;
+}
+button#sitemapButton
+{
+    padding: 10px 20px;
+    margin-right: 1px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #002fff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 1s, color 1s;
+}
+button#sitemapButton:hover {
+    background-color: black;
+    color: white;
 }
